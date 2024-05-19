@@ -1,4 +1,4 @@
-# Project Name
+# BatteryOpt
 
 ## Description
 This repository models an energy arbitrage problem using Julia JuMP. It leverages state-of-the-art GPU technology to efficiently solve large optimization problems.
