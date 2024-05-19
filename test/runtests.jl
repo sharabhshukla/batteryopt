@@ -43,18 +43,25 @@ end
 
 # Test 4: Test energy_arbitrage! function
 function test_energy_arbitrage()
+    optimizer = SCS.Optimizer
+    linear_solver = SCS.LinearSolver
+    max_time = 100
+    max_iter = 1000
+    tol = 1e-6
+    optimizer_config = batteryopt.OptimizerConfig(optimizer, linear_solver, max_time, max_iter, tol)
     battery = batteryopt.GenericBattery("Battery 1", 100.0, 0.9, 50.0, 50.0, 0.8, 0.2)
     energy_buy = [0.1, 0.2, 0.3, 0.4]
     energy_sell = [0.4, 0.3, 0.2, 0.1]
     time_idx = [Dates.DateTime(2022, 1, 1), Dates.DateTime(2022, 1, 2), Dates.DateTime(2022, 1, 3), Dates.DateTime(2022, 1, 4)]
     energy_prices = batteryopt.EnergyPrices(energy_buy, energy_sell, time_idx)
     initial_energy = 0.5
-    charging_power, discharging_power, energy_stored =  batteryopt.energy_arbitrage!(battery, energy_prices, initial_energy)
+    charging_power, discharging_power, energy_stored, revenue =  batteryopt.energy_arbitrage!(battery, energy_prices, initial_energy, optimizer_config)
     # Add assertions here to test the results
     @assert maximum(charging_power) <= battery.max_charging_power + 1e-3
     @assert maximum(discharging_power) <= battery.max_discharging_power + 1e-3
     @assert maximum(energy_stored) <= battery.max_energy + 1e-3
     @assert minimum(energy_stored) >= battery.min_energy - 1e-3
+    @assert revenue > 0.0
 end
 
 # Run the tests

@@ -61,7 +61,7 @@ struct OptimizerConfig
     end
 end
 
-function energy_arbitrage!(battery::GenericBattery, energy_prices::EnergyPrices, initial_energy::Float64)
+function energy_arbitrage!(battery::GenericBattery, energy_prices::EnergyPrices, initial_energy::Float64, optimizer_config::OptimizerConfig)    
     t_idx = energy_prices.time_idx
     m = Model(SCS.Optimizer)
 
@@ -72,11 +72,11 @@ function energy_arbitrage!(battery::GenericBattery, energy_prices::EnergyPrices,
     @constraint(m, energy[t_idx[1]] == initial_energy)
     @constraint(m, energy_dynamics_constr[t in 2: length(t_idx) - 1], energy[t_idx[t]] == energy[t_idx[t-1]] + battery.rte_efficiency*charging_power[t_idx[t]] - discharging_power[t_idx[t]]/battery.rte_efficiency)
 
-    @objective(m, Min, sum(energy_prices.energy_buy[i]*charging_power[t] - energy_prices.energy_sell[i]*discharging_power[t] for (i, t) in enumerate(t_idx)))
+    @objective(m, Max, sum(energy_prices.energy_sell[i]*discharging_power[t] - energy_prices.energy_buy[i]*charging_power[t] for (i, t) in enumerate(t_idx)))
 
     optimize!(m)
 
-    return value.(charging_power), value.(discharging_power), value.(energy)
+    return value.(charging_power), value.(discharging_power), value.(energy), objective_value(m)
 end
 
 export Battery, EnergyPrices,  OptimizerConfig, energy_arbitrage!
