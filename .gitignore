@@ -43,3 +43,6 @@ scratch/
 
 # ignore data files
 data/realistic_energy_prices.csv
+
+# ignore vscode settings json
+.vscode/settings.json
