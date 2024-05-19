@@ -50,14 +50,14 @@ mutable struct EnergyPrices
 end
 
 struct OptimizerConfig
-    optimizer::SCS.Optimizer
-    linear_solver::SCS.LinearSolver
+    optimizer::Any
+    linear_solver::Any
     max_time::Int
     max_iter::Int
     tol::Float64
 
-    function OptimizerConfig(optimizer::SCS.Optimizer, max_time::Int, max_iter::Int, tol::Float64)
-        return new(optimizer, max_time, max_iter, tol)
+    function OptimizerConfig(optimizer::Any, linear_solver::Any, max_time::Int, max_iter::Int, tol::Float64)
+        return new(optimizer, linear_solver, max_time, max_iter, tol)
     end
 end
 
@@ -65,18 +65,14 @@ function energy_arbitrage!(battery::GenericBattery, energy_prices::EnergyPrices,
     t_idx = energy_prices.time_idx
     m = Model(SCS.Optimizer)
 
-    @variable(m, 0 <= charging_power[t_idx] <= battery.max_charging_power)
-    @variable(m, 0 <= discharging_power[t_idx] <= battery.max_discharging_power)
-    @variable(m, min_energy <= energy[t_idx] <= max_energy)
+    @variable(m,  0 <= charging_power[t_idx] <= battery.max_charging_power)
+    @variable(m,  0 <= discharging_power[t_idx] <= battery.max_discharging_power)
+    @variable(m, battery.min_energy <= energy[t_idx] <= battery.max_energy)
 
-    @constraint(m, energy[1] == initial_energy)
-    @constraint(m, energy[T] == initial_energy)
+    @constraint(m, energy[t_idx[1]] == initial_energy)
+    @constraint(m, energy_dynamics_constr[t in 2: length(t_idx) - 1], energy[t_idx[t]] == energy[t_idx[t-1]] + battery.rte_efficiency*charging_power[t_idx[t]] - discharging_power[t_idx[t]]/battery.rte_efficiency)
 
-    for t in t_idx[2:end]
-        @constraint(m, energy[t] == energy[t-1] + battery.rte_efficiency*charging_power[t] - discharging_power[t]/battery.rte_efficiency)
-    end
-
-    @objective(m, Min, sum(energy_prices.energy_buy[t]*charging_power[t] - energy_prices.energy_sell[t]*discharging_power[t] for t in 1:T))
+    @objective(m, Min, sum(energy_prices.energy_buy[i]*charging_power[t] - energy_prices.energy_sell[i]*discharging_power[t] for (i, t) in enumerate(t_idx)))
 
     optimize!(m)
 
