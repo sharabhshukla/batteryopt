@@ -1,0 +1,4 @@
+[core]
+    remote = storage
+['remote "storage"']
+    url = s3://dvc-datasets-2024-05-19/dvcstore

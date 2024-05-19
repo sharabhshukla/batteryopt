@@ -37,3 +37,9 @@ JuliaManifest.toml
 # Build files
 build/
 dist/
+
+# ignore temporary scract files
+scratch/ 
+
+# ignore data files
+data/realistic_energy_prices.csv
