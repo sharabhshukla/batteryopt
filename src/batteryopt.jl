@@ -1,7 +1,5 @@
 module batteryopt
-
 using JuMP, SCS, Dates
-
 struct GenericBattery
     name::String
     capacity::Float64
@@ -35,7 +33,6 @@ struct GenericBattery
     end
 end
 
-
 mutable struct EnergyPrices
     energy_buy::Vector{Float64}
     energy_sell::Vector{Float64}
@@ -51,7 +48,6 @@ mutable struct EnergyPrices
         return new(energy_buy, energy_sell, time_idx)
     end
 end
-
 
 struct OptimizerConfig
     optimizer::SCS.Optimizer
@@ -87,7 +83,5 @@ function energy_arbitrage!(battery::GenericBattery, energy_prices::EnergyPrices,
     return value.(charging_power), value.(discharging_power), value.(energy)
 end
 
-
-
-export Battery, EnergyPrices, energy_arbitrage!
+export Battery, EnergyPrices,  OptimizerConfig, energy_arbitrage!
 end # module batteryopt
