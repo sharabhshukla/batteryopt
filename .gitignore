@@ -1,5 +1,4 @@
 # Julia specific
-*.jl
 *.ji
 *.julia-environment
 *.julia-compat
