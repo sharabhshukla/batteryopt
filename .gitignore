@@ -1,0 +1,39 @@
+# Julia specific
+*.jl
+*.ji
+*.julia-environment
+*.julia-compat
+*.julia-history
+.julia_packages
+
+# Compiled files
+*.ji
+*.jl.fdb_latexmk
+*.jl.fdb_latexmk
+*.jl.fls
+*.jl.log
+*.jl.synctex.gz
+*.jl.toc
+*.jl.aux
+*.jl.bbl
+*.jl.blg
+*.jl.out
+*.jl.pdf
+*.jl.run.xml
+*.jl.vrb
+
+# Dependency files
+Manifest.toml
+Project.toml
+JuliaProject.toml
+JuliaManifest.toml
+
+# Editor specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build files
+build/
+dist/
