@@ -1,6 +1,6 @@
 module batteryopt
 
-using JuMP, SCS, DateTime
+using JuMP, SCS, Dates
 
 struct GenericBattery
     name::String
@@ -41,7 +41,7 @@ mutable struct EnergyPrices
     energy_sell::Vector{Float64}
     time_idx::Vector{DateTime}
 
-    function EnergyPrices(energy_buy::Vector{Float64}, energy_sell::Vector{Float64}, time_idx::Vector{Int})
+    function EnergyPrices(energy_buy::Vector{Float64}, energy_sell::Vector{Float64}, time_idx::Vector{DateTime})
         if length(energy_buy) != length(energy_sell)
             throw(ArgumentError("energy_buy and energy_sell must have the same length"))
         end
