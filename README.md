@@ -1,7 +1,7 @@
 # BatteryOpt
 
 ## Description
-This repository models an energy arbitrage problem using Julia JuMP. It leverages state-of-the-art GPU technology to efficiently solve large optimization problems.
+This repository models an energy arbitrage problem using Julia JuMP. It leverages state-of-the-art first order solvers to efficiently solve large optimization problems.
 
 This project uses a first order solver to solve the problem. In order to install SCS, use `Pkg.add("SCS")`. However, if you wish to use SCS on a GPU, use the CUDA version of it. Unfortunately, at the moment only CUDA is supported.
 
