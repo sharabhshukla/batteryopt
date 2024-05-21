@@ -1,10 +1,12 @@
 using batteryopt
-using CSV, DataFrames, SCS, Gadfly
+using CSV, DataFrames, SCS, HiGHS, PlotlyJS
 
 
 @info "Reading data from CSV"
 # Read the data stored in a csv
 data = CSV.read("data/realistic_energy_prices.csv", DataFrame)
+
+@show first(data, 5)
 
 
 @info "Extracting data from DataFrame"
@@ -17,10 +19,10 @@ energy_sell = data[:, "Sell Price (USD/MWh)"]
 
 GenericBattery = batteryopt.GenericBattery(
     "Ideal Battery",
-    250.00,
-    1.0,
-    125.0,
-    125.0,
+    0.250,
+    1.00,
+    0.125,
+    0.125,
     1.00,
     0.00
 )
@@ -28,12 +30,13 @@ GenericBattery = batteryopt.GenericBattery(
 
 prices = batteryopt.EnergyPrices(energy_buy, energy_sell, time_idx)
 
-config = batteryopt.OptimizerConfig(
-    SCS.Optimizer,
+config = batteryopt.ModelConfig(
+    HiGHS.Optimizer,
     SCS.LinearSolver,
     60,
     1000,
-    1e-6
+    1e-6,
+    true
 )
 
 # Run the optimization
@@ -42,17 +45,6 @@ charging_power, discharging_power, energy_stored, revenue = batteryopt.energy_ar
 @info "Optimization complete"
 @info "Revenue: $revenue"
 
-# Plot the results, in three vertically stacked graphs with linked xaxes
-# (1) Plot energy buy and sell prices
-# (2) Plot the energy charging and discharging
-# (3) Plot the energy stored in the battery
-p1 = plot(data, x=:"Datetime", y=:"Buy Price (USD/MWh)", Geom.line, Guide.title("Energy Prices"), Guide.ylabel("Price (USD/MWh)"))
-#p2 = plot(data, x=:Datetime, y=[charging_power, discharging_power], Geom.line, Guide.title("Charging and Discharging Power"), Guide.ylabel("Power (MW)"))
-#p3 = plot(data, x=:Datetime, y=energy_stored, Geom.line, Guide.title("Energy Stored in Battery"), Guide.ylabel("Energy (MWh)"))
-# Now stack the plots vertically
+results = batteryopt.Results(prices, charging_power, discharging_power, energy_stored, revenue)
 
-
-
-
-
-
+batteryopt.plot_results!(results)

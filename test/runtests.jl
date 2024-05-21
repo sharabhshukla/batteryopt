@@ -27,13 +27,13 @@ function test_energy_prices_initialization()
 end
 
 # Test 3: Test OptimizerConfig initialization
-function test_optimizer_config_initialization()
+function test_optimizer_model_config_initialization()
     optimizer = SCS.Optimizer
     linear_solver = SCS.LinearSolver
     max_time = 100
     max_iter = 1000
     tol = 1e-6
-    optimizer_config = batteryopt.OptimizerConfig(optimizer, linear_solver, max_time, max_iter, tol)
+    optimizer_config = batteryopt.ModelConfig(optimizer, linear_solver, max_time, max_iter, tol)
     @test optimizer_config.optimizer == optimizer
     @test optimizer_config.max_time == max_time
     @test optimizer_config.max_iter == max_iter
@@ -75,7 +75,7 @@ end
     end
 
     @testset "OptimizerConfig" begin
-         test_optimizer_config_initialization()
+         test_optimizer_model_config_initialization()
     end
 
     @testset "energy_arbitrage!" begin
